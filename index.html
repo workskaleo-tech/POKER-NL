@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poker Tracker NL10</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <div class="container">
+        <header>
+            <div class="logo-wrapper">
+    <h1 class="logo-text">POKER<span>STATS</span></h1>
+    <span class="badge">NL10</span>
+    <button onclick="login()" style="background:none; border:1px solid #333; color:#555; font-size:0.7rem; border-radius:4px; cursor:pointer; margin-left:10px;">Login Admin</button>
+</div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <small>💰 Bankroll Total</small>
+                    <div class="value" id="total-br">500.00€</div>
+                </div>
+                <div class="stat-card">
+                    <small>📈 Volume</small>
+                    <div class="value" id="total-volume">0</div>
+                </div>
+                <div class="stat-card">
+                    <small>🎯 Winrate</small>
+                    <div class="value" id="winrate">0 bb/100</div>
+                </div>
+                <div class="stat-card">
+                    <small>🏆 Taux de Réussite</small>
+                    <div class="value" id="success-rate">0%</div>
+                </div>
+            </div>
+
+            <div class="xp-bar-wrapper">
+                <div class="xp-bar-header">
+                    <span class="xp-title">🎯 Objectif 1000€</span>
+                    <span id="br-progression-text" class="xp-percentage">0%</span>
+                </div>
+                <div class="xp-track">
+                    <div class="xp-fill" id="progress-bar-fill"></div>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="chart-container">
+                <canvas id="myChart"></canvas>
+            </div>
+        </main>
+
+        <section class="entry-form">
+            <div class="input-group">
+                <label>Date</label>
+                <input type="date" id="input-date">
+            </div>
+            <div class="input-group">
+                <label>Mains</label>
+                <input type="number" id="input-hands" placeholder="500">
+            </div>
+            <div class="input-group">
+                <label>Gain (€)</label>
+                <input type="number" step="0.01" id="input-gain" placeholder="12.50">
+            </div>
+            <button class="btn-add" onclick="addSession()">Ajouter</button>
+        </section>
+
+        <section class="history-section">
+            <h3>Historique NL10</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Mains</th>
+                            <th>Résultat</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-list"></tbody>
+                </table>
+            </div>
+            <button class="btn-reset" onclick="resetData()">Réinitialiser le challenge</button>
+        </section>
+        <div class="share-actions">
+            <button class="btn-secondary" onclick="exportData()">
+                <span class="icon">📤</span> Exporter
+            </button>
+            <button class="btn-secondary" onclick="importData()">
+                <span class="icon">📥</span> Importer
+            </button>
+        </div>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
