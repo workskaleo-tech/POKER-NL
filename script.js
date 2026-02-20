@@ -105,19 +105,28 @@ function updateUI() {
     const user = auth.currentUser;
     const isAntoine = user && user.email === ADMIN_EMAIL;
 
+// --- NOUVELLE LOGIQUE D'AFFICHAGE ---
+    let rows = []; // On crée une liste vide pour stocker nos lignes de tableau
+    
     if(historyBody) {
-        historyBody.innerHTML = sessions.map((s) => {
-            totalHands += s.hands; currentProfitNet += s.gain;
+        sessions.forEach((s) => { // On utilise forEach pour faire les calculs
+            totalHands += s.hands; 
+            currentProfitNet += s.gain;
             if (s.gain > 0) winningSessions++;
             handsLabels.push(totalHands);
             profitsNet.push(parseFloat(currentProfitNet.toFixed(2)));
-            return `<tr>
+
+            // On prépare la ligne HTML et on l'ajoute à notre liste "rows"
+            rows.push(`<tr>
                 <td style="color: #888;">${s.date}</td>
                 <td>${s.hands.toLocaleString()}</td>
                 <td style="color: ${s.gain >= 0 ? '#4ade80' : '#ff5555'}">${s.gain.toFixed(2)}€</td>
                 <td>${isAntoine ? `<button class="btn-delete" onclick="deleteSession('${s.id}')">✕</button>` : ''}</td>
-            </tr>`;
-        }).join('');
+            </tr>`);
+        });
+
+        // ICI LA MAGIE : On inverse la liste des lignes avant de l'afficher !
+        historyBody.innerHTML = rows.reverse().join('');
     }
 
     const brElem = document.getElementById('total-br');
