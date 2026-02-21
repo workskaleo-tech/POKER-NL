@@ -1,13 +1,12 @@
 body {
     background-color: #121212;
     color: white;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Montserrat', sans-serif !important; /* On force la nouvelle typo */
     display: flex;
     justify-content: center;
     padding: 20px;
     margin: 0;
 }
-
 #bg-canvas {
     position: fixed;
     top: 0;
@@ -397,22 +396,67 @@ th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
         font-size: 1.3rem; /* On réduit un peu la taille pour que ça rentre */
     }
 
-    /* Le formulaire passe en colonne */
-    .entry-form {
-        flex-direction: column; 
-        align-items: stretch;
-        gap: 15px;
-        padding: 15px;
-    }
+   /* --- HARMONISATION DU FORMULAIRE --- */
+.entry-form {
+    background: rgba(25, 25, 25, 0.6) !important;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    display: none; /* Reste géré par le JS */
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
 
-    #input-date, #input-hands, #input-gain {
-        width: 100% !important; 
-    }
+/* Style des labels (Date, Mains, Gain) */
+.input-group label {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #a1a1aa;
+    margin-bottom: 8px;
+    display: block;
+}
 
-    .btn-add {
-        width: 100%;
-        padding: 15px;
-    }
+/* Style des champs de saisie (Inputs) */
+input {
+    background: rgba(10, 10, 10, 0.5) !important;
+    border: 1px solid #333 !important;
+    color: white !important;
+    font-family: 'Montserrat', sans-serif !important;
+    padding: 12px;
+    border-radius: 8px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+}
+
+/* Bouton Ajouter style "Premium" */
+.btn-add {
+    background: linear-gradient(90deg, #3b82f6, #4ade80) !important;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+}
 
     /* On réduit le logo pour gagner de la place */
     .logo-text {
