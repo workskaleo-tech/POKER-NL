@@ -182,7 +182,8 @@ function renderChart(labels, values) {
 // --- 6. ANIMATIONS DE FOND (ÉTOILES & FUMÉE) ---
 const bgCanvas = document.getElementById('bg-canvas');
 const bgCtx = bgCanvas.getContext('2d');
-let stars = [], smokeTrail = [], mouse = { x: null, y: null };
+// On garde stars et smokeTrail intacts, on ajoute juste la suite
+let stars = [], smokeTrail = [], shootingStars = [], shootingStarTimer = 0, fireballs = [], fireballTimer = 0, mouse = { x: null, y: null };
 
 function initBg() {
     bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
@@ -199,22 +200,127 @@ window.addEventListener('mousemove', (e) => {
     }
 });
 
+function createShootingStar() {
+    shootingStars.push({
+        x: Math.random() * bgCanvas.width, 
+        y: -10, 
+        vx: (Math.random() - 0.5) * 4, 
+        vy: Math.random() * 5 + 7, // Elle tombe vite
+        trail: [] 
+    });
+}
+
+function createFireball() {
+    fireballs.push({
+        x: Math.random() * bgCanvas.width, // Position horizontale aléatoire
+        y: -30, // Commence bien au-dessus de l'écran
+        vx: (Math.random() - 0.5) * 2, // Dérive latérale lente
+        vy: Math.random() * 2 + 3, // Tombe plus lentement que les étoiles filantes (plus lourd)
+        size: Math.random() * 4 + 3, // Taille variable (plus gros que les étoiles)
+        trail: [] // Pour la traînée de feu
+    });
+}
+
 function animateBg() {
     bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+    
+    // --- TES POINTS LUMINEUX (ON NE TOUCHE À RIEN ICI) ---
     bgCtx.fillStyle = "rgba(59, 130, 246, 0.2)";
     stars.forEach(p => {
         p.x += p.sx; p.y += p.sy;
         if(p.x < 0 || p.x > bgCanvas.width) p.sx *= -1; if(p.y < 0 || p.y > bgCanvas.height) p.sy *= -1;
         bgCtx.beginPath(); bgCtx.arc(p.x, p.y, 2, 0, Math.PI * 2); bgCtx.fill();
     });
+
+    // --- LA FUMÉE (RESTE INTACTE AUSSI) ---
     for (let i = 0; i < smokeTrail.length; i++) {
-        let s = smokeTrail[i]; s.x += s.speedX; s.y += s.speedY; s.size += 0.2; s.opacity -= 0.01;
+        let s = smokeTrail[i]; s.x += s.speedX; s.y += s.speedY; s.size += 0.6; s.opacity -= 0.012;
         if (s.opacity <= 0) { smokeTrail.splice(i, 1); i--; } 
-        else { bgCtx.beginPath(); bgCtx.arc(s.x, s.y, s.size, 0, Math.PI * 2); bgCtx.fillStyle = `rgba(59, 130, 246, ${s.opacity * 0.15})`; bgCtx.fill(); }
+        else {
+            const gradient = bgCtx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.size);
+            gradient.addColorStop(0, `rgba(59, 130, 246, ${s.opacity * 0.15})`);
+            gradient.addColorStop(0.7, `rgba(59, 130, 246, ${s.opacity * 0.05})`);
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            bgCtx.beginPath(); bgCtx.fillStyle = gradient; bgCtx.arc(s.x, s.y, s.size, 0, Math.PI * 2); bgCtx.fill();
+        }
     }
+
+    // --- NOUVEAU : ÉTOILES FILANTES PASSAGÈRES ---
+    shootingStarTimer++;
+    if (shootingStarTimer > 800) { // Environ toutes les 15-20 secondes (très discret)
+        createShootingStar();
+        shootingStarTimer = 0;
+    }
+
+    shootingStars.forEach((s, idx) => {
+        s.x += s.vx; s.y += s.vy;
+        s.trail.push({x: s.x, y: s.y});
+        if(s.trail.length > 15) s.trail.shift();
+
+        // Dessin de la queue
+        bgCtx.beginPath();
+        bgCtx.strokeStyle = "rgba(147, 197, 253, 0.4)";
+        bgCtx.lineWidth = 1;
+        s.trail.forEach(t => bgCtx.lineTo(t.x, t.y));
+        bgCtx.stroke();
+
+        // Suppression si sortie d'écran
+        if(s.y > bgCanvas.height) shootingStars.splice(idx, 1);
+    });
+
+    // --- NOUVEAU : LES BOULES DE FEU PASSAGÈRES (JUSTE AVANT LA FIN) ---
+
+// Timer : Fréquence augmentée (environ toutes les 10-20 secondes)
+    fireballTimer++;
+    if (fireballTimer > Math.random() * 1000 + 500) { 
+        createFireball();
+        fireballTimer = 0;
+    }
+
+    fireballs.forEach((fb, idx) => {
+        fb.x += fb.vx; fb.y += fb.vy;
+        
+        // On garde une traînée plus longue pour l'effet de feu
+        fb.trail.push({x: fb.x, y: fb.y, size: fb.size});
+        if(fb.trail.length > 25) fb.trail.shift();
+
+        // 1. DESSIN DE LA TRAÎNÉE (QUEUE DE FEU)
+        if(fb.trail.length > 1) {
+            bgCtx.beginPath();
+            // Dégradé du rouge transparent vers le orange vif
+            let fireGrad = bgCtx.createLinearGradient(fb.trail[0].x, fb.trail[0].y, fb.x, fb.y);
+            fireGrad.addColorStop(0, "rgba(255, 50, 0, 0)"); // Queue qui disparaît
+            fireGrad.addColorStop(1, "rgba(255, 140, 0, 0.6)"); // Corps de la flamme
+            
+            bgCtx.strokeStyle = fireGrad;
+            // La traînée est épaisse comme la boule
+            bgCtx.lineWidth = fb.size; 
+            // Bords arrondis pour un aspect fluide
+            bgCtx.lineCap = 'round';
+            
+            fb.trail.forEach(t => bgCtx.lineTo(t.x, t.y));
+            bgCtx.stroke();
+        }
+
+        // 2. DESSIN DE LA TÊTE (CŒUR INCANDESCENT)
+        bgCtx.beginPath();
+        bgCtx.arc(fb.x, fb.y, fb.size, 0, Math.PI * 2);
+        // Cœur jaune/blanc très chaud
+        bgCtx.fillStyle = "#ffddaa"; 
+        // Gros halo ("glow") orange/rouge intense
+        bgCtx.shadowColor = "#ff4500"; 
+        bgCtx.shadowBlur = 25; 
+        bgCtx.fill();
+        bgCtx.shadowBlur = 0; // Reset du halo pour ne pas affecter le reste
+
+        // Suppression si sortie d'écran loin en bas
+        if(fb.y > bgCanvas.height + 50) fireballs.splice(idx, 1);
+    });
+    
+    // --- FIN DU NOUVEAU BLOC ---
+
     requestAnimationFrame(animateBg);
 }
-
 function animateValue(id, start, end, duration) {
     const obj = document.getElementById(id);
     if (!obj) return;
@@ -233,6 +339,29 @@ function resetData() {
         db.collection("sessions").get().then((q) => q.forEach((doc) => doc.ref.delete()));
     }
 }
+
+// On attend que le document soit prêt
+document.addEventListener('DOMContentLoaded', () => {
+    // On cible la première carte de stats (celle de la Bankroll)
+    const bankrollCard = document.querySelector('.stat-card');
+
+    if (bankrollCard) {
+        bankrollCard.style.cursor = 'pointer'; // On montre que c'est cliquable
+
+        bankrollCard.addEventListener('click', () => {
+            // On ajoute la classe d'animation
+            bankrollCard.classList.add('spinning');
+            
+            // On joue un petit son de "pop" si tu veux
+            if (typeof playPop === "function") playPop();
+
+            // On retire la classe après 600ms (durée de l'anim) pour pouvoir recommencer
+            setTimeout(() => {
+                bankrollCard.classList.remove('spinning');
+            }, 600);
+        });
+    }
+});
 
 window.addEventListener('resize', initBg);
 initBg(); animateBg(); setTodayDate();

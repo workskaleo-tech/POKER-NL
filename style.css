@@ -52,7 +52,7 @@ header { margin-bottom: 25px; }
 /* Cette taille s'applique UNIQUEMENT à "STATS" */
 .logo-text span {
     font-size: 2rem; /* <--- RÉDUIS CETTE VALEUR pour rapetisser STATS */
-    font-weight: 500; 
+    font-weight: 600; 
     -webkit-text-fill-color: #ffffff;
     letter-spacing: 0px;
     margin-left: 2px;
@@ -466,4 +466,21 @@ input:focus {
     .logo-text span {
         font-size: 1.4rem;
     }
+}
+
+/* 1. On donne de la profondeur à la grille pour l'effet 3D */
+.stats-grid {
+    perspective: 1000px;
+}
+
+/* 2. L'animation de la pièce qui tourne */
+@keyframes coin-spin {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(360deg); }
+}
+
+/* 3. La classe qui sera ajoutée par le JavaScript */
+.spinning {
+    animation: coin-spin 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
 }
