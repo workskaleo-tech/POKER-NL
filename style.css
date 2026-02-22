@@ -533,3 +533,34 @@ select option {
         flex-grow: 1; /* Le filtre prend toute la largeur restante */
     }
 }
+
+/* --- ADAPTATION MOBILE UNIQUEMENT --- */
+@media (max-width: 600px) {
+    /* ... tes autres règles mobiles existantes ... */
+
+    /* 1. On permet au conteneur du tableau de défiler de gauche à droite */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Rend le défilement très fluide sur iPhone/Android */
+        margin-bottom: 20px;
+    }
+
+    /* 2. On force le tableau à avoir une largeur minimum pour que rien ne soit écrasé */
+    table {
+        min-width: 500px; /* Si l'écran est plus petit que 500px, on pourra scroller horizontalement */
+    }
+
+    /* 3. On réduit un peu les marges internes (padding) et la police pour gagner de la place */
+    th, td {
+        padding: 8px 4px; /* Moins d'espace vide autour des chiffres */
+        font-size: 0.8rem; /* Police un peu plus petite sur mobile */
+    }
+    
+    /* 4. On s'assure que le bouton "Action" (la croix) prenne moins de place */
+    th:nth-child(5), td:nth-child(5) { 
+        width: 10%; 
+    }
+    th:nth-child(4), td:nth-child(4) { 
+        width: 35%; /* On donne encore plus de place aux BB ! */
+    }
+}
