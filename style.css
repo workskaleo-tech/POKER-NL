@@ -98,9 +98,9 @@ header { margin-bottom: 25px; }
 .stat-card small {
     position: relative;
     z-index: 1;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
+    letter-spacing: 1.2px;
     color: #a1a1aa;
     font-weight: 700;
     margin-bottom: 8px;
@@ -109,7 +109,7 @@ header { margin-bottom: 25px; }
 .value { 
     position: relative;
     z-index: 1;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 900; 
     margin-top: 5px; 
     letter-spacing: 0.5px;
