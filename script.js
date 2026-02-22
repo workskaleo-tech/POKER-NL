@@ -35,9 +35,10 @@ auth.onAuthStateChanged(user => {
 
 // --- 3. VARIABLES ET SYNCHRO ---
 let sessions = [];
-const START_BR = 500.00; 
-const GOAL_BR = 1000.00;
-let previousBr = START_BR;
+// On retire ces deux lignes car elles sont maintenant gérées dynamiquement :
+// const START_BR = 500.00; 
+// const GOAL_BR = 1000.00;
+let previousBr = 0;
 
 db.collection("sessions").orderBy("fullDate", "asc").onSnapshot((snapshot) => {
     sessions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -89,6 +90,28 @@ function updateUI() {
     const filterElem = document.getElementById('global-filter');
     const filterValue = filterElem ? filterElem.value : "ALL";
 
+    // --- 1. CONFIGURATION DYNAMIQUE SELON LE FILTRE ---
+    let startBR, goalBR;
+    if (filterValue === "NL10") {
+        startBR = 500;
+        goalBR = 1000;
+    } else if (filterValue === "NL2") {
+        startBR = 35;  // 👈 D'après votre capture d'écran
+        goalBR = 500;  // 👈 D'après votre capture d'écran
+    } else { 
+        // Mode "ALL" (Vue globale)
+        // On met juste le VRAI dépôt initial. Les 500€ de la NL10 sont déjà comptés dans vos gains NL2 !
+        startBR = 35;  
+        goalBR = 1000; 
+    }
+
+    // Mise à jour du texte au-dessus de la barre d'XP
+    const xpTitle = document.getElementById('xp-title-text');
+    if(xpTitle) {
+        xpTitle.innerText = `🏁 Départ ${startBR}€ ➔ 🎯 Objectif ${goalBR}€`;
+    }
+    // --------------------------------------------------
+
     let filteredSessions = sessions.filter(s => {
         const sessionStake = s.stake || "NL10";
         if (filterValue === "ALL") return true;
@@ -97,6 +120,8 @@ function updateUI() {
 
     let handsLabels = [0]; let profitsNet = [0];  
     let totalHands = 0; let currentProfitNet = 0; let winningSessions = 0;
+    let totalBB = 0; // ✅ NOUVEAU : On va compter le total exact des Big Blinds
+    
     const historyBody = document.getElementById('history-list');
     const user = auth.currentUser;
     const isAntoine = user && user.email === ADMIN_EMAIL;
@@ -113,6 +138,8 @@ function updateUI() {
         const sessionStake = s.stake || "NL10";
         const bbValue = (sessionStake === "NL2") ? 0.02 : 0.10;
         const gainBB = s.gain / bbValue;
+        
+        totalBB += gainBB; // ✅ NOUVEAU : On ajoute les BB de la session au total global
 
         rows.push(`<tr>
             <td style="color: #888; font-weight: 400;">${s.date} <br><small style="font-weight:400; color:#3b82f6;">${sessionStake}</small></td>
@@ -127,17 +154,23 @@ function updateUI() {
 
     if(historyBody) historyBody.innerHTML = rows.reverse().join('');
 
+    // --- 2. CALCULS DE LA BANKROLL AVEC LE startBR DYNAMIQUE ---
     const brElem = document.getElementById('total-br');
     if(brElem) {
-        const newBr = START_BR + currentProfitNet;
-        animateValue('total-br', previousBr, newBr, 1000); 
+        const newBr = startBR + currentProfitNet;
+        if (previousBr === 0 || Math.abs(previousBr - newBr) > 200) {
+             brElem.innerText = newBr.toFixed(2) + "€";
+        } else {
+             animateValue('total-br', previousBr, newBr, 1000); 
+        }
         previousBr = newBr; 
     }
     
     document.getElementById('total-volume').innerText = totalHands.toLocaleString();
     
-    const currentBB = (filterValue === "NL2") ? 0.02 : 0.10;
-    let winrate = totalHands > 0 ? (currentProfitNet / currentBB) / (totalHands / 100) : 0;
+    // ✅ CORRECTION DU WINRATE ICI : On utilise le totalBB exact calculé dans la boucle
+    let winrate = totalHands > 0 ? totalBB / (totalHands / 100) : 0;
+    
     const winrateElem = document.getElementById('winrate');
     winrateElem.innerText = (winrate >= 0 ? '+' : '') + winrate.toFixed(2) + " bb/100";
     winrateElem.style.color = winrate >= 0 ? '#4ade80' : '#ff5555';
@@ -145,9 +178,12 @@ function updateUI() {
     let successRate = filteredSessions.length > 0 ? (winningSessions / filteredSessions.length) * 100 : 0;
     document.getElementById('success-rate').innerText = successRate.toFixed(1) + "%";
     
-    let prog = (currentProfitNet / (GOAL_BR - START_BR)) * 100;
-    document.getElementById('br-progression-text').innerText = Math.min(100, Math.max(0, prog)).toFixed(1) + "%";
-    document.getElementById('progress-bar-fill').style.width = Math.min(100, Math.max(0, prog)) + "%";
+    // --- 3. CALCUL DE LA BARRE D'XP ---
+    let prog = (currentProfitNet / (goalBR - startBR)) * 100;
+    let displayProg = Math.min(100, Math.max(0, prog)); 
+    
+    document.getElementById('br-progression-text').innerText = displayProg.toFixed(1) + "%";
+    document.getElementById('progress-bar-fill').style.width = displayProg + "%";
 
     renderChart(handsLabels, profitsNet);
 }
