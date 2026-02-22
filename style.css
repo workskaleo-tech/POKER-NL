@@ -1,7 +1,8 @@
+/* --- 1. BASE & CANVAS --- */
 body {
     background-color: #121212;
     color: white;
-    font-family: 'Montserrat', sans-serif !important; /* On force la nouvelle typo */
+    font-family: 'Montserrat', sans-serif !important;
     display: flex;
     justify-content: center;
     padding: 20px;
@@ -9,69 +10,49 @@ body {
 }
 #bg-canvas {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     z-index: -1;
-    /* On enlève le filter: blur qui cassait tes points ! */
     pointer-events: none;
 }
-
 .container { width: 100%; max-width: 1000px; position: relative; z-index: 10; }
 
+/* --- 2. HEADER & LOGO --- */
 header { margin-bottom: 25px; }
-
 .logo-wrapper {
     display: flex;
     align-items: center; 
     gap: 15px;           
     margin-bottom: 25px;
 }
-
 .logo-text {
     margin: 0;
     font-size: 2.8rem;
-    font-weight: 900; /* Épaisseur maximale pour POKER */
+    font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 1px;
-    
-    /* Utilisation exacte du dégradé de ta barre d'XP */
     background: linear-gradient(90deg, #1e3a8a, #3b82f6, #4ade80);
     background-size: 200% auto;
-    
-    /* Application du dégradé au texte */
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    
-    /* Animation de balayage (shine) */
     animation: shine 5s linear infinite;
     filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.4));
 }
-
-/* Cette taille s'applique UNIQUEMENT à "STATS" */
 .logo-text span {
-    font-size: 2rem; /* <--- RÉDUIS CETTE VALEUR pour rapetisser STATS */
+    font-size: 2rem;
     font-weight: 600; 
     -webkit-text-fill-color: #ffffff;
     letter-spacing: 0px;
     margin-left: 2px;
-/* --- ALIGNEMENT VERS LE BAS --- */
     vertical-align: baseline; 
 }
-
 @keyframes shine {
-    /* On part de 0 et on va vers le négatif pour inverser le mouvement */
     from { background-position: 0% center; }
     to { background-position: -200% center; }
 }
-
 .badge { 
     background: linear-gradient(135deg, #3b82f6, #2563eb);
-    /* RÉDUCTION DU PADDING : 4px en haut/bas, 8px à gauche/droite */
     padding: 4px 8px; 
     border-radius: 4px; 
-    /* RÉDUCTION DE LA POLICE : passage de 0.85rem à 0.7rem */
     font-size: 0.7rem; 
     text-transform: uppercase;
     font-weight: bold;
@@ -79,26 +60,23 @@ header { margin-bottom: 25px; }
     box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
     white-space: nowrap;
-    
-    /* ALIGNEMENT : Petit ajustement pour qu'il soit bien en face du texte */
     margin-bottom: 6px; 
 }
 
+/* --- 3. STATS GRID & CARDS --- */
 .stats-grid { 
     display: grid; 
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
     gap: 15px; 
     margin-bottom: 20px; 
+    perspective: 1000px;
 }
-
-/* --- NOUVEAUX BLOCS DE STATISTIQUES --- */
 .stat-card {
     position: relative;
     background: linear-gradient(145deg, rgba(35, 35, 35, 0.9) 0%, rgba(20, 20, 20, 0.9) 100%);
     padding: 20px;
     border-radius: 12px;
     border: 1px solid #333;
-    /* Le fameux liseré bleu néon en haut */
     border-top: 2px solid rgba(59, 130, 246, 0.6); 
     text-align: center;
     backdrop-filter: blur(5px);
@@ -109,8 +87,6 @@ header { margin-bottom: 25px; }
     flex-direction: column;
     justify-content: center;
 }
-
-/* Effet de lueur interne (glow) qui vient du haut */
 .stat-card::before {
     content: '';
     position: absolute;
@@ -119,42 +95,34 @@ header { margin-bottom: 25px; }
     pointer-events: none;
     z-index: 0;
 }
-
-/* Style des titres (Bankroll, Volume...) */
 .stat-card small {
     position: relative;
     z-index: 1;
     font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    color: #a1a1aa; /* Gris clair élégant */
+    color: #a1a1aa;
     font-weight: 700;
     margin-bottom: 8px;
     display: block;
 }
-
-/* Style des gros chiffres */
 .value { 
     position: relative;
     z-index: 1;
-    font-size: 1.8rem; /* Chiffres un peu plus gros */
+    font-size: 1.8rem;
     font-weight: 900; 
     margin-top: 5px; 
     letter-spacing: 0.5px;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.5); /* Ombre pour détacher le texte */
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
-
-/* Animation au survol de la souris */
 .stat-card:hover {
     transform: translateY(-6px);
-    border-color: #3b82f6; /* La bordure s'allume en bleu */
-    border-top: 2px solid #60a5fa; /* Le haut devient plus brillant */
-    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15); /* Ombre bleutée sous la carte */
+    border-color: #3b82f6;
+    border-top: 2px solid #60a5fa;
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15);
 }
 
-.value { font-size: 1.6rem; font-weight: bold; margin-top: 5px; }
-
-/* --- BARRE DE PROGRESSION XP (JEU VIDÉO) --- */
+/* --- 4. BARRE XP --- */
 .xp-bar-wrapper {
     width: 100%;
     background: rgba(20, 20, 20, 0.8);
@@ -163,9 +131,8 @@ header { margin-bottom: 25px; }
     border: 1px solid #333;
     margin-bottom: 30px;
     box-sizing: border-box;
-    box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.5); /* Effet creusé pour le fond */
+    box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.5);
 }
-
 .xp-bar-header {
     display: flex;
     justify-content: space-between;
@@ -173,7 +140,6 @@ header { margin-bottom: 25px; }
     margin-bottom: 12px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-
 .xp-title {
     color: #888;
     font-weight: 600;
@@ -181,17 +147,15 @@ header { margin-bottom: 25px; }
     text-transform: uppercase;
     letter-spacing: 2px;
 }
-
 .xp-percentage {
     color: #4ade80;
     font-weight: 800;
     font-size: 1.3rem;
     text-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
 }
-
 .xp-track {
     width: 100%;
-    height: 24px; /* Hauteur de la barre d'XP */
+    height: 24px;
     background: #0a0a0a;
     border-radius: 12px;
     border: 2px solid #222;
@@ -199,287 +163,164 @@ header { margin-bottom: 25px; }
     position: relative;
     box-shadow: inset 0 3px 6px rgba(0,0,0,0.9);
 }
-
-
-/* --- LE REFLET LUMINEUX --- */
 .xp-track::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: -100%;
-    width: 60%; 
-    height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.3) 50%,
-        transparent 100%
-    );
-    z-index: 10; 
-    pointer-events: none;
+    top: 0; left: -100%; width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+    z-index: 10; pointer-events: none;
     animation: shine-sweep 4s infinite cubic-bezier(0.4, 0.0, 0.2, 1);
 }
-
 @keyframes shine-sweep {
     0% { left: -100%; }
     30% { left: 100%; }
     100% { left: 100%; }
 }
-
 .xp-fill {
     height: 100%;
-    width: 0%; /* Sera animé par le JavaScript */
-    background-color: #3b82f6; /* Couleur de base */
-    /* Dégradé néon (Bleu foncé -> Bleu clair -> Vert) */
+    width: 0%;
     background-image: linear-gradient(90deg, #1e3a8a, #3b82f6, #4ade80);
     border-radius: 10px;
     transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 0 15px rgba(74, 222, 128, 0.5); /* Halo lumineux */
+    box-shadow: 0 0 15px rgba(74, 222, 128, 0.5);
     position: relative;
 }
-
-
-/* Ajout des rayures animées style barre de chargement jeu vidéo */
 .xp-fill::after {
     content: "";
-    position: absolute;
-    top: 0; left: 0; bottom: 0; right: 0;
-    background-image: linear-gradient(
-        -45deg, 
-        rgba(255, 255, 255, 0.15) 25%, 
-        transparent 25%, 
-        transparent 50%, 
-        rgba(255, 255, 255, 0.15) 50%, 
-        rgba(255, 255, 255, 0.15) 75%, 
-        transparent 75%, 
-        transparent
-    );
+    position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+    background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%);
     background-size: 40px 40px;
     animation: moveStripes 1.5s linear infinite;
     border-radius: 10px;
 }
-
 @keyframes moveStripes {
     0% { background-position: 0 0; }
     100% { background-position: 40px 0; }
 }
 
+/* --- 5. ACTIONS & BOUTONS SECONDAIRES --- */
 .share-actions {
-    display: flex;
-    gap: 12px;                  /* Espace entre les boutons légèrement réduit */
-    margin-top: 30px;           /* Espace au-dessus */
-    margin-bottom: 40px;        /* Espace en dessous pour ne pas coller au bas de la page */
-    justify-content: center;
+    display: flex; gap: 12px; margin-top: 30px; margin-bottom: 40px; justify-content: center;
 }
-
 .btn-secondary {
-    background: transparent;     /* Fond transparent par défaut : plus classe */
-    border: 1px solid rgba(59, 130, 246, 0.2); /* Bordure très subtile */
-    color: #3b82f6;              /* Texte bleu */
-    padding: 8px 16px;           /* TAILLE RÉDUITE : boutons moins hauts */
-    border-radius: 6px;          /* Coins un peu moins arrondis */
-    cursor: pointer;
-    font-size: 0.85rem;          /* TAILLE RÉDUITE : police plus petite */
-    font-weight: 600;            /* Texte un peu plus gras pour la lisibilité */
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s ease-in-out; /* Transition plus rapide */
-    backdrop-filter: blur(4px);
+    background: transparent;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+    padding: 8px 16px; border-radius: 6px;
+    cursor: pointer; font-size: 0.85rem; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+    transition: all 0.2s ease-in-out; backdrop-filter: blur(4px);
 }
-
 .btn-secondary:hover {
-    background: rgba(59, 130, 246, 0.1); /* Le fond bleu apparaît au survol */
-    border-color: #3b82f6;               /* La bordure devient bleu vif */
-    color: #60a5fa;                      /* Le texte s'éclaire */
-    transform: translateY(-2px);         /* Petit effet de soulèvement */
-    /* Petit halo lumineux néon au survol */
+    background: rgba(59, 130, 246, 0.1);
+    border-color: #3b82f6; color: #60a5fa;
+    transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15); 
 }
+.btn-secondary .icon { font-size: 1rem; }
 
-/* On réduit aussi un peu la taille des icônes 📤📥 */
-.btn-secondary .icon {
-    font-size: 1rem;
-}
-
+/* --- 6. FORMULAIRE DE SAISIE (CENTRÉ & UNIFIÉ) --- */
 .entry-form {
     background: rgba(30, 30, 30, 0.9);
-    padding: 20px;
-    border-radius: 12px;
-    border: 1px solid #333;
-    margin-bottom: 25px;
-    display: none; /* <--- MODIFIE CETTE LIGNE ICI */
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap;
-    align-items: flex-end;
+    padding: 20px; border-radius: 12px; border: 1px solid #333;
+    margin: 0 auto 25px auto; /* CENTRE LE BLOC ENTIER SUR DESKTOP */
+    max-width: fit-content;
+    display: none; /* Reste géré par le JS */
+    justify-content: center; /* CENTRE LES CASES DEDANS */
+    gap: 15px; flex-wrap: wrap;
+    align-items: flex-end; /* ALIGNE TOUT SUR LE BAS */
 }
 
 .input-group { display: flex; flex-direction: column; gap: 8px; }
-
-input {
-    background: #121212;
-    border: 1px solid #444;
-    color: white;
-    padding: 12px;
-    border-radius: 8px;
-    outline: none;
-    font-size: 0.9rem;
+.input-group label {
+    font-weight: 600; font-size: 0.75rem;
+    text-transform: uppercase; color: #a1a1aa;
+    margin-bottom: 8px; display: block;
 }
 
-input[type="date"]::-webkit-calendar-picker-indicator {
-    /* Ce filtre transforme l'icône noire d'origine en bleu #3b82f6 */
+/* STYLE DES INPUTS (DARK MODE + HAUTEUR 45PX) */
+.entry-form input {
+    background: rgba(10, 10, 10, 0.5) !important;
+    border: 1px solid #444 !important;
+    color: white !important;
+    padding: 12px; border-radius: 8px; outline: none;
+    height: 45px !important; /* MÊME HAUTEUR PARTOUT */
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+/* Largeurs spécifiques */
+#input-date { width: 160px; }
+#input-time { width: 110px; }
+#input-hands, #input-gain { width: 110px; }
+
+/* Icônes bleues */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
     filter: invert(43%) sepia(74%) saturate(2421%) hue-rotate(203deg) brightness(101%) contrast(101%) !important;
     cursor: pointer;
 }
 
-#input-date { width: 160px; }
-#input-hands, #input-gain { width: 110px; }
+/* Flèches sombres permanentes */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1 !important;
+    filter: grayscale(100%) brightness(40%) !important;
+    cursor: pointer;
+}
 
+/* Bouton Ajouter aligné */
 .btn-add {
     background: #3b82f6;
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
+    color: white; border: none; border-radius: 8px;
+    font-weight: bold; cursor: pointer;
+    height: 45px; /* Même hauteur que les cases */
+    padding: 0 25px;
+    display: flex; align-items: center; justify-content: center;
     transition: all 0.3s ease;
 }
+.btn-add:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4); }
 
-.btn-add:hover { background: #2563eb; transform: translateY(-2px); }
-
+/* --- 7. GRAPHIQUE & TABLEAU --- */
 .chart-container {
     background: rgba(30, 30, 30, 0.9);
-    border-radius: 12px;
-    border: 1px solid #444;
-    padding: 20px;
-    height: 400px;
-    margin-bottom: 30px;
+    border-radius: 12px; border: 1px solid #444;
+    padding: 20px; height: 400px; margin-bottom: 30px;
 }
-
 .history-section { background: rgba(30, 30, 30, 0.9); padding: 25px; border-radius: 12px; border: 1px solid #333; }
 .table-container { max-height: 300px; overflow-y: auto; }
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
 
 .btn-delete { 
-    background: rgba(59, 130, 246, 0.05); 
-    border: 1px solid rgba(59, 130, 246, 0.3); 
-    color: #3b82f6; 
-    padding: 4px 10px; 
-    border-radius: 6px; 
-    cursor: pointer; 
-    transition: all 0.2s ease;
+    background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.3); 
+    color: #3b82f6; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;
 }
-
-.btn-delete:hover { 
-    background: #ff5555; /* Devient rouge uniquement au survol pour la sécurité */
-    border-color: #ff5555;
-    color: white;
-}
+.btn-delete:hover { background: #ff5555; border-color: #ff5555; color: white; }
 .btn-reset { background: none; border: none; color: #555; font-size: 0.8rem; cursor: pointer; text-decoration: underline; width: 100%; margin-top: 20px; }
 
-/* --- ADAPTATION MOBILE (Écrans inférieurs à 768px) --- */
+/* --- 8. ADAPTATION MOBILE --- */
 @media (max-width: 768px) {
-    /* On passe les cartes de stats sur 2 colonnes au lieu de 4 */
-    .stats-grid {
-        grid-template-columns: 1fr 1fr; 
-        gap: 10px;
-    }
-
-    .stat-card {
-        padding: 15px 10px;
-    }
-
-    .value {
-        font-size: 1.3rem; /* On réduit un peu la taille pour que ça rentre */
-    }
-
-   /* --- HARMONISATION DU FORMULAIRE --- */
-.entry-form {
-    background: rgba(25, 25, 25, 0.6) !important;
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    padding: 25px;
-    border-radius: 12px;
-    margin-bottom: 25px;
-    display: none; /* Reste géré par le JS */
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-    align-items: flex-end;
-}
-
-/* Style des labels (Date, Mains, Gain) */
-.input-group label {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    color: #a1a1aa;
-    margin-bottom: 8px;
-    display: block;
-}
-
-/* Style des champs de saisie (Inputs) */
-input {
-    background: rgba(10, 10, 10, 0.5) !important;
-    border: 1px solid #333 !important;
-    color: white !important;
-    font-family: 'Montserrat', sans-serif !important;
-    padding: 12px;
-    border-radius: 8px;
-    outline: none;
-    transition: all 0.3s ease;
-}
-
-input:focus {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
-}
-
-/* Bouton Ajouter style "Premium" */
-.btn-add {
-    background: linear-gradient(90deg, #3b82f6, #4ade80) !important;
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 8px;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-add:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
-}
-
-    /* On réduit le logo pour gagner de la place */
-    .logo-text {
-        font-size: 2rem;
-    }
+    .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat-card { padding: 15px 10px; }
+    .value { font-size: 1.3rem; }
+    .logo-text { font-size: 2rem; }
+    .logo-text span { font-size: 1.4rem; }
     
-    .logo-text span {
-        font-size: 1.4rem;
+    .entry-form {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        max-width: 100%;
     }
+    .entry-form input, #input-date, #input-time { width: 100% !important; }
 }
 
-/* 1. On donne de la profondeur à la grille pour l'effet 3D */
-.stats-grid {
-    perspective: 1000px;
-}
-
-/* 2. L'animation de la pièce qui tourne */
+/* --- 9. ANIMATIONS 3D --- */
 @keyframes coin-spin {
     0% { transform: rotateY(0deg); }
     100% { transform: rotateY(360deg); }
 }
-
-/* 3. La classe qui sera ajoutée par le JavaScript */
 .spinning {
     animation: coin-spin 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     transform-style: preserve-3d;

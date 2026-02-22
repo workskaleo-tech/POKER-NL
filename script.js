@@ -66,32 +66,39 @@ function playPop() {
     osc.start(); osc.stop(audioCtx.currentTime + 0.05);
 }
 
-// --- 5. LOGIQUE ---
 function setTodayDate() {
     const inputDate = document.getElementById('input-date');
-    if(inputDate) inputDate.value = new Date().toISOString().split('T')[0];
+    const inputTime = document.getElementById('input-time'); // On cible la nouvelle case
+    const now = new Date();
+    
+    if(inputDate) inputDate.value = now.toISOString().split('T')[0];
+    // On récupère l'heure et les minutes locales (ex: 14:30)
+    if(inputTime) inputTime.value = now.toTimeString().slice(0,5); 
 }
 
 function addSession() {
     const handsInput = document.getElementById('input-hands');
     const gainInput = document.getElementById('input-gain');
     const dateInput = document.getElementById('input-date');
+    const timeInput = document.getElementById('input-time'); // On récupère l'élément
     
     const hands = parseInt(handsInput.value);
     const gain = parseFloat(gainInput.value);
     const rawDate = dateInput.value;
+    const rawTime = timeInput.value; // On récupère l'heure choisie
 
-    if (isNaN(hands) || isNaN(gain) || !rawDate) return alert("Remplis tout !");
+    if (isNaN(hands) || isNaN(gain) || !rawDate || !rawTime) return alert("Remplis tout !");
 
     db.collection("sessions").add({
         date: rawDate.split('-').reverse().slice(0,2).join('/'),
-        fullDate: rawDate,
+        // On fusionne Date + T + Heure pour un tri Firebase parfait
+        fullDate: rawDate + "T" + rawTime, 
         hands: hands,
         gain: gain
     }).then(() => {
         playPop();
         handsInput.value = ''; gainInput.value = '';
-    }).catch(() => alert("Action interdite : Tu n'es pas Antoine !"));
+    });
 }
 
 function deleteSession(id) {
