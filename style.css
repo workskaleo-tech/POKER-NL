@@ -296,23 +296,36 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 .history-section { background: rgba(30, 30, 30, 0.9); padding: 25px; border-radius: 12px; border: 1px solid #333; }
 .table-container { max-height: 300px; overflow-y: auto; }
-/* --- OPTIMISATION DE LA RÉPARTITION DU TABLEAU --- */
-table { 
-    width: 100%; 
-    border-collapse: collapse; 
-    /* Force le respect des largeurs définies ci-dessous */
-    table-layout: fixed; 
+/* --- ALIGNEMENT PARFAIT DU TABLEAU --- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* Indispensable pour que les largeurs th/td soient identiques */
 }
 
-th, td { 
-    padding: 12px 8px; 
-    text-align: center; 
-    border-bottom: 1px solid #333; 
-    font-weight: 700;
-    /* Évite que le texte ne déborde si une valeur est trop longue */
+th, td {
+    padding: 12px 5px;
+    text-align: center;
+    border-bottom: 1px solid #333;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+/* Répartition des 5 colonnes sur 100% de la largeur */
+th:nth-child(1), td:nth-child(1) { width: 20%; } /* Date + Stake */
+th:nth-child(2), td:nth-child(2) { width: 15%; } /* Mains */
+th:nth-child(3), td:nth-child(3) { width: 20%; } /* Gain € */
+th:nth-child(4), td:nth-child(4) { width: 30%; } /* Gain BB (plus large pour la lisibilité) */
+th:nth-child(5), td:nth-child(5) { width: 15%; } /* Action */
+
+/* Style des en-têtes (on garde ton réglage de gras à 600) */
+th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #a1a1aa;
+    letter-spacing: 1.2px;
+    font-weight: 600; 
 }
 
 /* --- DÉFINITION DES LARGEURS DE COLONNES --- */
@@ -386,4 +399,47 @@ th:nth-child(5), td:nth-child(5) { width: 15%; }
 .spinning {
     animation: coin-spin 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     transform-style: preserve-3d;
+}
+
+/* Animation au survol du filtre */
+#global-filter {
+    transition: all 0.3s ease;
+}
+
+#global-filter:hover {
+    border-color: #3b82f6 !important;
+    background: rgba(59, 130, 246, 0.1) !important;
+}
+
+/* --- FIX: Options du menu déroulant en Dark Mode --- */
+select option {
+    background-color: #1e1e1e; /* Force un fond sombre */
+    color: #ffffff;            /* Force le texte en blanc */
+}
+
+/* --- PERSONNALISATION DE LA BARRE DE DÉFILEMENT (SCROLLBAR) --- */
+
+/* Pour Firefox */
+.table-container {
+    scrollbar-width: thin;
+    scrollbar-color: #444444 #1a1a1a;
+}
+
+/* Pour Chrome, Safari et Edge */
+.table-container::-webkit-scrollbar {
+    width: 8px; /* Rend la barre un peu plus fine et élégante */
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #1a1a1a; /* Le "rail" de la barre, gris très foncé pour se fondre dans le décor */
+    border-radius: 8px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #444444; /* La "poignée" de la barre, gris moyen */
+    border-radius: 8px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: #555555; /* Un peu plus clair quand on passe la souris dessus */
 }
