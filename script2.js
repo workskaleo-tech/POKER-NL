@@ -286,6 +286,9 @@ function importData() {
         return alert("Seul l'admin peut importer des données.");
     }
 
+    // 🛑 VÉRIFICATION ANTI-CACHE : Si vous ne voyez pas ce message, c'est que GitHub bloque !
+    alert("🚀 Le nouveau script TERMINATOR est bien activé !");
+
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json'; 
@@ -309,8 +312,7 @@ function importData() {
                     let rawGain = String(s.gain).replace(',', '.');
                     let gainNumber = parseFloat(rawGain);
 
-                    // 🛑 LE SCANNER TERMINATOR (Regex) 🛑
-                    // On transforme toute la ligne de données en texte brut et on cherche la date DD/MM/YYYY
+                    // LE SCANNER (Regex)
                     let sString = JSON.stringify(s);
                     let match = sString.match(/(\d{2})\/(\d{2})\/(\d{4})/);
                     
@@ -322,7 +324,7 @@ function importData() {
                         let mois = match[2];
                         let annee = match[3];
                         
-                        displayDate = `${jour}/${mois}`; // Donne "24/09"
+                        displayDate = `${jour}/${mois}`; 
                         isoDate = `${annee}-${mois}-${jour}T${String(count).padStart(4, '0')}`;
                     }
 
@@ -337,7 +339,7 @@ function importData() {
                     count++;
                 });
                 
-                alert("✅ VICTOIRE ! " + count + " sessions importées avec la date PARFAITE !");
+                alert("✅ VICTOIRE ! " + count + " sessions importées avec la bonne date !");
             } catch (err) {
                 alert("❌ Erreur. Le fichier n'est pas un JSON valide.");
                 console.error(err);
