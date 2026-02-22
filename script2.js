@@ -306,19 +306,26 @@ function importData() {
                 let count = 0;
                 
                 data.forEach(s => {
-                    // 1. Formatage du gain (remplace la virgule par un point)
                     let rawGain = String(s.gain).replace(',', '.');
                     let gainNumber = parseFloat(rawGain);
 
-                    // 2. Formatage de la date (On cible l'émoji exact ou la 1ère colonne en sécurité)
-                    let rawDate = s["🕐date"] || Object.values(s)[0];
-                    let datePart = String(rawDate).split(' ')[0]; // Récupère "24/09/2025"
-                    let displayDate = datePart.split('/').slice(0, 2).join('/'); // Garde "24/09"
+                    // 🛑 LE SCANNER TERMINATOR (Regex) 🛑
+                    // On transforme toute la ligne de données en texte brut et on cherche la date DD/MM/YYYY
+                    let sString = JSON.stringify(s);
+                    let match = sString.match(/(\d{2})\/(\d{2})\/(\d{4})/);
                     
-                    let parts = datePart.split('/'); 
-                    let isoDate = `${parts[2]}-${parts[1]}-${parts[0]}T${String(count).padStart(4, '0')}`;
+                    let displayDate = "00/00";
+                    let isoDate = "2000-01-01T0000";
 
-                    // 3. Envoi à Firebase
+                    if (match) {
+                        let jour = match[1];
+                        let mois = match[2];
+                        let annee = match[3];
+                        
+                        displayDate = `${jour}/${mois}`; // Donne "24/09"
+                        isoDate = `${annee}-${mois}-${jour}T${String(count).padStart(4, '0')}`;
+                    }
+
                     db.collection("sessions").add({
                         date: displayDate,
                         fullDate: isoDate,
@@ -330,7 +337,7 @@ function importData() {
                     count++;
                 });
                 
-                alert("✅ MAGIQUE ! " + count + " sessions importées avec la bonne date !");
+                alert("✅ VICTOIRE ! " + count + " sessions importées avec la date PARFAITE !");
             } catch (err) {
                 alert("❌ Erreur. Le fichier n'est pas un JSON valide.");
                 console.error(err);
