@@ -223,6 +223,136 @@ function resetData() {
     }
 }
 
+// --- 7. ANIMATIONS DE FOND (ÉTOILES, FUMÉE, BOULES DE FEU) ---
+const bgCanvas = document.getElementById('bg-canvas');
+if (bgCanvas) {
+    const bgCtx = bgCanvas.getContext('2d');
+    let stars = [], smokeTrail = [], shootingStars = [], shootingStarTimer = 0, fireballs = [], fireballTimer = 0, mouse = { x: null, y: null };
+
+    function initBg() {
+        bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
+        stars = [];
+        for (let i = 0; i < 50; i++) {
+            stars.push({ x: Math.random() * bgCanvas.width, y: Math.random() * bgCanvas.height, sx: (Math.random() - 0.5) * 0.5, sy: (Math.random() - 0.5) * 0.5 });
+        }
+    }
+
+    window.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX; mouse.y = e.clientY;
+        for(let i = 0; i < 2; i++) {
+            smokeTrail.push({ x: mouse.x, y: mouse.y, size: Math.random() * 5 + 2, speedX: (Math.random() - 0.5) * 0.8, speedY: (Math.random() - 1) * 0.4, opacity: 1 });
+        }
+    });
+
+    function createShootingStar() {
+        shootingStars.push({
+            x: Math.random() * bgCanvas.width, 
+            y: -10, 
+            vx: (Math.random() - 0.5) * 4, 
+            vy: Math.random() * 5 + 7,
+            trail: [] 
+        });
+    }
+
+    function createFireball() {
+        fireballs.push({
+            x: Math.random() * bgCanvas.width, 
+            y: -30, 
+            vx: (Math.random() - 0.5) * 2, 
+            vy: Math.random() * 2 + 3, 
+            size: Math.random() * 4 + 3, 
+            trail: [] 
+        });
+    }
+
+    function animateBg() {
+        bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+        
+        // Étoiles de fond
+        bgCtx.fillStyle = "rgba(59, 130, 246, 0.2)";
+        stars.forEach(p => {
+            p.x += p.sx; p.y += p.sy;
+            if(p.x < 0 || p.x > bgCanvas.width) p.sx *= -1; if(p.y < 0 || p.y > bgCanvas.height) p.sy *= -1;
+            bgCtx.beginPath(); bgCtx.arc(p.x, p.y, 2, 0, Math.PI * 2); bgCtx.fill();
+        });
+
+        // Fumée de souris
+        for (let i = 0; i < smokeTrail.length; i++) {
+            let s = smokeTrail[i]; s.x += s.speedX; s.y += s.speedY; s.size += 0.6; s.opacity -= 0.012;
+            if (s.opacity <= 0) { smokeTrail.splice(i, 1); i--; } 
+            else {
+                const gradient = bgCtx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.size);
+                gradient.addColorStop(0, `rgba(59, 130, 246, ${s.opacity * 0.15})`);
+                gradient.addColorStop(0.7, `rgba(59, 130, 246, ${s.opacity * 0.05})`);
+                gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                bgCtx.beginPath(); bgCtx.fillStyle = gradient; bgCtx.arc(s.x, s.y, s.size, 0, Math.PI * 2); bgCtx.fill();
+            }
+        }
+
+        // Étoiles filantes
+        shootingStarTimer++;
+        if (shootingStarTimer > 800) { 
+            createShootingStar();
+            shootingStarTimer = 0;
+        }
+
+        shootingStars.forEach((s, idx) => {
+            s.x += s.vx; s.y += s.vy;
+            s.trail.push({x: s.x, y: s.y});
+            if(s.trail.length > 15) s.trail.shift();
+
+            bgCtx.beginPath();
+            bgCtx.strokeStyle = "rgba(147, 197, 253, 0.4)";
+            bgCtx.lineWidth = 1;
+            s.trail.forEach(t => bgCtx.lineTo(t.x, t.y));
+            bgCtx.stroke();
+
+            if(s.y > bgCanvas.height) shootingStars.splice(idx, 1);
+        });
+
+        // Boules de feu
+        fireballTimer++;
+        if (fireballTimer > Math.random() * 1000 + 500) { 
+            createFireball();
+            fireballTimer = 0;
+        }
+
+        fireballs.forEach((fb, idx) => {
+            fb.x += fb.vx; fb.y += fb.vy;
+            fb.trail.push({x: fb.x, y: fb.y, size: fb.size});
+            if(fb.trail.length > 25) fb.trail.shift();
+
+            if(fb.trail.length > 1) {
+                bgCtx.beginPath();
+                let fireGrad = bgCtx.createLinearGradient(fb.trail[0].x, fb.trail[0].y, fb.x, fb.y);
+                fireGrad.addColorStop(0, "rgba(255, 50, 0, 0)");
+                fireGrad.addColorStop(1, "rgba(255, 140, 0, 0.6)");
+                bgCtx.strokeStyle = fireGrad;
+                bgCtx.lineWidth = fb.size; 
+                bgCtx.lineCap = 'round';
+                fb.trail.forEach(t => bgCtx.lineTo(t.x, t.y));
+                bgCtx.stroke();
+            }
+
+            bgCtx.beginPath();
+            bgCtx.arc(fb.x, fb.y, fb.size, 0, Math.PI * 2);
+            bgCtx.fillStyle = "#ffddaa"; 
+            bgCtx.shadowColor = "#ff4500"; 
+            bgCtx.shadowBlur = 25; 
+            bgCtx.fill();
+            bgCtx.shadowBlur = 0;
+
+            if(fb.y > bgCanvas.height + 50) fireballs.splice(idx, 1);
+        });
+
+        requestAnimationFrame(animateBg);
+    }
+
+    window.addEventListener('resize', initBg);
+    initBg(); 
+    animateBg();
+}
+
 // --- 8. EXPORT ET IMPORT DES DONNÉES ---
 function exportData() {
     if (!auth.currentUser || auth.currentUser.email !== ADMIN_EMAIL) {
@@ -246,7 +376,6 @@ function importData() {
         return alert("Seul l'admin peut importer des données.");
     }
 
-    // 🚀 ALERTE DE VÉRIFICATION
     alert("🚀 Le nouveau script TERMINATOR est bien activé !");
 
     const input = document.createElement('input');
@@ -270,7 +399,6 @@ function importData() {
                     let rawGain = String(s.gain).replace(',', '.');
                     let gainNumber = parseFloat(rawGain);
 
-                    // 🛑 LE SCANNER TERMINATOR (Regex) 🛑
                     let sString = JSON.stringify(s);
                     let match = sString.match(/(\d{2})\/(\d{2})\/(\d{4})/);
                     
@@ -303,5 +431,31 @@ function importData() {
     setTimeout(() => document.body.removeChild(input), 100); 
 }
 
-// --- 7. ANIMATIONS DE FOND ---
-// (On garde tes animations d'étoiles et de boules de feu ici...)
+let audioCtx;
+function playPop() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
+    gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+}
+
+// Initialisation au démarrage
+setTodayDate();
+
+document.addEventListener('DOMContentLoaded', () => {
+    const bankrollCard = document.querySelector('.stat-card');
+    if (bankrollCard) {
+        bankrollCard.style.cursor = 'pointer'; 
+        bankrollCard.addEventListener('click', () => {
+            bankrollCard.classList.add('spinning');
+            if (typeof playPop === "function") playPop();
+            setTimeout(() => { bankrollCard.classList.remove('spinning'); }, 600);
+        });
+    }
+});
