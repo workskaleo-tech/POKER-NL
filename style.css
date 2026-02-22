@@ -374,21 +374,41 @@ th:nth-child(5), td:nth-child(5) { width: 15%; }
 .btn-delete:hover { background: #ff5555; border-color: #ff5555; color: white; }
 .btn-reset { background: none; border: none; color: #555; font-size: 0.8rem; cursor: pointer; text-decoration: underline; width: 100%; margin-top: 20px; }
 
-/* --- 8. ADAPTATION MOBILE --- */
-@media (max-width: 768px) {
-    .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-    .stat-card { padding: 15px 10px; }
-    .value { font-size: 1.3rem; }
-    .logo-text { font-size: 2rem; }
-    .logo-text span { font-size: 1.4rem; }
-    
-    .entry-form {
+/* --- ADAPTATION POUR LES ÉCRANS MOBILES --- */
+@media (max-width: 600px) {
+    .header-top-row {
         flex-direction: column;
-        align-items: stretch;
-        width: 100%;
-        max-width: 100%;
+        align-items: stretch !important;
     }
-    .entry-form input, #input-date, #input-time { width: 100% !important; }
+    
+    /* On modifie le comportement du logo et du bouton */
+    .logo-wrapper {
+        width: 100%;
+        justify-content: center; /* On centre tout au lieu d'écarter */
+        flex-wrap: wrap;         /* Permet au bouton de passer à la ligne si l'écran est minuscule */
+        gap: 10px;               /* Crée un espace propre entre les éléments */
+        margin-bottom: 15px !important;
+    }
+    
+    /* On annule la marge gauche forcée du bouton sur mobile */
+    .logo-wrapper button {
+        margin-left: 0 !important; 
+    }
+    
+    .header-filter {
+        width: 100%;
+    }
+    
+    #global-filter {
+        width: 100%; 
+        text-align: center;
+        padding: 12px;
+    }
+
+    /* Grille 2x2 pour les stats */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 /* --- 9. ANIMATIONS 3D --- */
