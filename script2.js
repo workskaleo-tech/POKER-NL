@@ -306,23 +306,23 @@ function importData() {
                 let count = 0;
                 
                 data.forEach(s => {
+                    // 1. Formatage du gain (remplace la virgule par un point)
                     let rawGain = String(s.gain).replace(',', '.');
                     let gainNumber = parseFloat(rawGain);
 
-                    // 🛑 L'ARME ABSOLUE : On prend la toute première colonne du fichier (la date), peu importe son nom !
-                    let firstKey = Object.keys(s)[0];
-                    let rawString = String(s[firstKey]);
-                    
-                    let datePart = rawString.split(' ')[0]; 
-                    let displayDate = datePart.split('/').slice(0, 2).join('/');
+                    // 2. Formatage de la date (On cible l'émoji exact ou la 1ère colonne en sécurité)
+                    let rawDate = s["🕐date"] || Object.values(s)[0];
+                    let datePart = String(rawDate).split(' ')[0]; // Récupère "24/09/2025"
+                    let displayDate = datePart.split('/').slice(0, 2).join('/'); // Garde "24/09"
                     
                     let parts = datePart.split('/'); 
                     let isoDate = `${parts[2]}-${parts[1]}-${parts[0]}T${String(count).padStart(4, '0')}`;
 
+                    // 3. Envoi à Firebase
                     db.collection("sessions").add({
                         date: displayDate,
                         fullDate: isoDate,
-                        hands: parseInt(s.hands),
+                        hands: parseInt(s.hands) || 0,
                         gain: gainNumber,
                         stake: "NL2" // Forcé en NL2
                     });
@@ -330,9 +330,9 @@ function importData() {
                     count++;
                 });
                 
-                alert("✅ MAGIQUE ! " + count + " sessions importées avec succès !");
+                alert("✅ MAGIQUE ! " + count + " sessions importées avec la bonne date !");
             } catch (err) {
-                alert("❌ Erreur lors de l'importation.");
+                alert("❌ Erreur. Le fichier n'est pas un JSON valide.");
                 console.error(err);
             }
         }
