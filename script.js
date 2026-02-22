@@ -214,6 +214,82 @@ function resetData() {
     }
 }
 
+// --- 8. EXPORT ET IMPORT DES DONNÉES ---
+
+function exportData() {
+    // Sécurité : Vérifie que c'est bien l'admin
+    if (!auth.currentUser || auth.currentUser.email !== ADMIN_EMAIL) {
+        return alert("Seul l'admin peut exporter les données.");
+    }
+    
+    // Crée un fichier JSON avec toutes tes sessions actuelles (Sauvegarde)
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(sessions));
+    const downloadNode = document.createElement('a');
+    downloadNode.setAttribute("href", dataStr);
+    downloadNode.setAttribute("download", "backup_poker_stats.json");
+    document.body.appendChild(downloadNode);
+    downloadNode.click();
+    downloadNode.remove();
+}
+
+function importData() {
+    if (!auth.currentUser || auth.currentUser.email !== ADMIN_EMAIL) {
+        return alert("Seul l'admin peut importer des données.");
+    }
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json'; 
+    
+    input.onchange = e => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.readAsText(file, 'UTF-8');
+        
+        reader.onload = readerEvent => {
+            try {
+                const data = JSON.parse(readerEvent.target.result);
+                let count = 0;
+                
+                data.forEach(s => {
+                    // 1. ASTUCE VIRGULE : Transforme "5,47" en "5.47"
+                    let rawGain = String(s.gain).replace(',', '.');
+                    let gainNumber = parseFloat(rawGain);
+
+                    // 2. ASTUCE DATE : On coupe tout ce qu'il y a après l'espace pour jeter l'heure
+                    let rawString = String(s.date);
+                    let datePart = rawString.split(' ')[0]; // Garde uniquement "24/09/2025"
+                    
+                    // Format pour l'affichage (ex: "24/09")
+                    let displayDate = datePart.split('/').slice(0, 2).join('/');
+                    
+                    // Format pour le tri Firebase (ex: "2025-09-24T0001")
+                    // On utilise "count" pour que les sessions d'un même jour gardent l'ordre exact de ton fichier !
+                    let parts = datePart.split('/'); 
+                    let isoDate = `${parts[2]}-${parts[1]}-${parts[0]}T${String(count).padStart(4, '0')}`;
+
+                    db.collection("sessions").add({
+                        date: displayDate,
+                        fullDate: isoDate,
+                        hands: parseInt(s.hands),
+                        gain: gainNumber,
+                        stake: "NL2" // Forcé en NL2
+                    });
+                    
+                    count++;
+                });
+                
+                alert("✅ MAGIQUE ! " + count + " sessions importées dans l'ordre de ton fichier.");
+            } catch (err) {
+                alert("❌ Erreur. Le fichier n'est pas un JSON valide.");
+                console.error(err);
+            }
+        }
+    };
+    
+    input.click(); 
+}
+
 // --- 7. ANIMATIONS DE FOND (ÉTOILES, FUMÉE, BOULES DE FEU) ---
 const bgCanvas = document.getElementById('bg-canvas');
 if (bgCanvas) {
