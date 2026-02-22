@@ -434,3 +434,90 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// --- 8. EXPORT ET IMPORT DES DONNÉES ---
+
+function exportData() {
+    // Sécurité : Vérifie que c'est bien l'admin
+    if (!auth.currentUser || auth.currentUser.email !== ADMIN_EMAIL) {
+        return alert("Seul l'admin peut exporter les données.");
+    }
+    
+    // Création d'un "Blob" (Méthode moderne et qui n'est pas bloquée)
+    const dataStr = JSON.stringify(sessions, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    // Création du lien de téléchargement
+    const downloadNode = document.createElement('a');
+    downloadNode.href = url;
+    downloadNode.download = "backup_poker_stats.json";
+    downloadNode.style.display = 'none';
+
+    // Ajout au document, clic, puis nettoyage !
+    document.body.appendChild(downloadNode);
+    downloadNode.click();
+    document.body.removeChild(downloadNode);
+    URL.revokeObjectURL(url); // Libère la mémoire
+}
+
+function importData() {
+    if (!auth.currentUser || auth.currentUser.email !== ADMIN_EMAIL) {
+        return alert("Seul l'admin peut importer des données.");
+    }
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json'; 
+    input.style.display = 'none';
+
+    // L'ASTUCE EST ICI : Ajouter l'input à la page avant de cliquer
+    document.body.appendChild(input); 
+    
+    input.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return; // Si l'utilisateur clique sur "Annuler"
+
+        const reader = new FileReader();
+        reader.readAsText(file, 'UTF-8');
+        
+        reader.onload = readerEvent => {
+            try {
+                const data = JSON.parse(readerEvent.target.result);
+                let count = 0;
+                
+                data.forEach(s => {
+                    let rawGain = String(s.gain).replace(',', '.');
+                    let gainNumber = parseFloat(rawGain);
+
+                    let rawString = String(s.date);
+                    let datePart = rawString.split(' ')[0]; 
+                    
+                    let displayDate = datePart.split('/').slice(0, 2).join('/');
+                    
+                    let parts = datePart.split('/'); 
+                    let isoDate = `${parts[2]}-${parts[1]}-${parts[0]}T${String(count).padStart(4, '0')}`;
+
+                    db.collection("sessions").add({
+                        date: displayDate,
+                        fullDate: isoDate,
+                        hands: parseInt(s.hands),
+                        gain: gainNumber,
+                        stake: "NL2" // Forcé en NL2
+                    });
+                    
+                    count++;
+                });
+                
+                alert("✅ MAGIQUE ! " + count + " sessions importées dans l'ordre de ton fichier.");
+            } catch (err) {
+                alert("❌ Erreur. Le fichier n'est pas un JSON valide.");
+                console.error(err);
+            }
+        }
+    };
+    
+    // On simule le clic, puis on retire l'élément de la page
+    input.click(); 
+    setTimeout(() => document.body.removeChild(input), 100); 
+}
