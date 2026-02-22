@@ -219,16 +219,23 @@ header { margin-bottom: 25px; }
 }
 .btn-secondary .icon { font-size: 1rem; }
 
-/* --- 6. FORMULAIRE DE SAISIE (CENTRÉ & UNIFIÉ) --- */
 .entry-form {
     background: rgba(30, 30, 30, 0.9);
-    padding: 20px; border-radius: 12px; border: 1px solid #333;
-    margin: 0 auto 25px auto; /* CENTRE LE BLOC ENTIER SUR DESKTOP */
-    max-width: fit-content;
-    display: none; /* Reste géré par le JS */
-    justify-content: center; /* CENTRE LES CASES DEDANS */
-    gap: 15px; flex-wrap: wrap;
-    align-items: flex-end; /* ALIGNE TOUT SUR LE BAS */
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #333;
+    margin: 0 auto 25px auto; 
+    
+    /* --- MODIFICATION ICI --- */
+    width: 100%;           /* On prend toute la largeur du container */
+    box-sizing: border-box; /* Indispensable pour que le padding ne fasse pas déborder le bloc */
+    /* ------------------------- */
+
+    display: none;          /* Reste géré par le JavaScript */
+    justify-content: center; /* Tes champs restent bien centrés à l'intérieur */
+    gap: 15px; 
+    flex-wrap: wrap; 
+    align-items: flex-end;
 }
 
 .input-group { display: flex; flex-direction: column; gap: 8px; }
@@ -289,12 +296,67 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 .history-section { background: rgba(30, 30, 30, 0.9); padding: 25px; border-radius: 12px; border: 1px solid #333; }
 .table-container { max-height: 300px; overflow-y: auto; }
-table { width: 100%; border-collapse: collapse; }
-th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
+/* --- OPTIMISATION DE LA RÉPARTITION DU TABLEAU --- */
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    /* Force le respect des largeurs définies ci-dessous */
+    table-layout: fixed; 
+}
 
+th, td { 
+    padding: 12px 8px; 
+    text-align: center; 
+    border-bottom: 1px solid #333; 
+    font-weight: 700;
+    /* Évite que le texte ne déborde si une valeur est trop longue */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* --- DÉFINITION DES LARGEURS DE COLONNES --- */
+/* Date : colonne étroite */
+th:nth-child(1), td:nth-child(1) { width: 15%; color: #888; } 
+
+/* Mains : colonne moyenne */
+th:nth-child(2), td:nth-child(2) { width: 20%; } 
+
+/* Résultat (€) : colonne large pour la lisibilité */
+th:nth-child(3), td:nth-child(3) { width: 25%; } 
+
+/* BB : colonne large identique au résultat */
+th:nth-child(4), td:nth-child(4) { width: 25%; } 
+
+/* Action : colonne étroite centrée sur le bouton */
+th:nth-child(5), td:nth-child(5) { width: 15%; }
+
+/* 2. On restaure le style du bouton (Carré et Bleu) */
 .btn-delete { 
-    background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.3); 
-    color: #3b82f6; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;
+    background: rgba(59, 130, 246, 0.05); 
+    border: 1px solid rgba(59, 130, 246, 0.3); 
+    color: #3b82f6; 
+    
+    /* On enlève le padding large pour mettre une taille fixe */
+    padding: 0; 
+    width: 30px; 
+    height: 30px;
+    
+    border-radius: 6px; 
+    cursor: pointer; 
+    transition: all 0.2s ease;
+
+    /* On centre la croix parfaitement */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+}
+
+.btn-delete:hover { 
+    background: #ff5555; 
+    border-color: #ff5555;
+    color: white;
 }
 .btn-delete:hover { background: #ff5555; border-color: #ff5555; color: white; }
 .btn-reset { background: none; border: none; color: #555; font-size: 0.8rem; cursor: pointer; text-decoration: underline; width: 100%; margin-top: 20px; }
