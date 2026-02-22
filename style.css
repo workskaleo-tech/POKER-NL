@@ -463,3 +463,73 @@ select option {
 .table-container::-webkit-scrollbar-thumb:hover {
     background: #555555; /* Un peu plus clair quand on passe la souris dessus */
 }
+
+/* --- NOUVEAU HEADER RESPONSIVE --- */
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    width: 100%;
+}
+
+.logo-group {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espace entre le logo et le badge NL10 */
+}
+
+.action-group {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espace entre bouton admin et filtre */
+}
+
+.btn-login {
+    background: transparent;
+    border: 1px solid #333;
+    color: #555;
+    font-size: 0.7rem;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 8px 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-login:hover {
+    color: #fff;
+    border-color: #555;
+}
+
+.filter-dropdown {
+    background: rgba(30, 30, 30, 0.6);
+    color: white;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: 0.85rem;
+    cursor: pointer;
+    outline: none;
+    backdrop-filter: blur(5px);
+}
+
+/* --- ADAPTATION MOBILE UNIQUEMENT --- */
+@media (max-width: 600px) {
+    .header-top {
+        flex-direction: column; /* Empile le logo au-dessus des boutons */
+        gap: 15px; 
+    }
+    
+    .action-group {
+        width: 100%; 
+        justify-content: space-between; /* Bouton admin à gauche, Filtre à droite */
+    }
+
+    .filter-dropdown {
+        flex-grow: 1; /* Le filtre prend toute la largeur restante */
+    }
+}

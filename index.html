@@ -6,28 +6,30 @@
     <title>Poker Tracker NL10</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css?v=4">
+    <script>
+    // Force le navigateur à toujours télécharger le tout dernier CSS (Anti-Cache Automatique)
+    document.write('<link rel="stylesheet" href="style.css?t=' + new Date().getTime() + '">');
+</script>
 </head>
 <body>
     <canvas id="bg-canvas"></canvas>
     <div class="container">
         <header>
-            <div class="header-top-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; width: 100%; flex-wrap: wrap; gap: 15px;">
-                
-                <div class="logo-wrapper" style="margin-bottom: 0; display: flex; align-items: center;">
-                    <h1 class="logo-text" style="margin: 0;">POKER<span>STATS</span></h1>
-                    <span class="badge">NL10</span>
-                    <button onclick="login()" style="background:none; border:1px solid #333; color:#555; font-size:0.7rem; border-radius:4px; cursor:pointer; margin-left:10px; padding: 4px 8px;">Login Admin</button>
-                </div>
-
-                <div class="header-filter">
-                    <select id="global-filter" onchange="updateUI()" style="background: rgba(30, 30, 30, 0.6); color: white; border: 1px solid rgba(59, 130, 246, 0.3); padding: 8px 15px; border-radius: 8px; font-family: 'Montserrat'; font-weight: 500; font-size: 0.85rem; cursor: pointer; outline: none; backdrop-filter: blur(5px);">
-                        <option value="NL10">Challenge NL10</option>
-                        <option value="NL2">Historique NL2</option>
-                        <option value="ALL">Vue Globale</option>
-                    </select>
-                </div>
-            </div>
+           <div class="header-top">
+    <div class="logo-group">
+        <h1 class="logo-text" style="margin: 0;">POKER<span>STATS</span></h1>
+        <span class="badge">NL10</span>
+    </div>
+    
+    <div class="action-group">
+        <button class="btn-login" onclick="login()">Login Admin</button>
+        <select id="global-filter" class="filter-dropdown" onchange="updateUI()">
+            <option value="NL10">Challenge NL10</option>
+            <option value="NL2">Historique NL2</option>
+            <option value="ALL">Vue Globale</option>
+        </select>
+    </div>
+</div>
             
             <div class="stats-grid">
                 <div class="stat-card">
